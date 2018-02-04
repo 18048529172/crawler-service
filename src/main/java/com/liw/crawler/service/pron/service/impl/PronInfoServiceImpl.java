@@ -2,7 +2,7 @@ package com.liw.crawler.service.pron.service.impl;
 
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import com.liw.crawler.service.pron.dao.PronEventDAO;
-import com.liw.crawler.service.pron.dao.PronInfoDAO;
+import com.liw.crawler.service.pron.dao.PronInfoOverviewDAO;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
 import com.liw.crawler.service.pron.entity.PronEvent;
 import com.liw.crawler.service.pron.entity.PronInfoOverview;
@@ -29,7 +29,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class PronInfoServiceImpl  implements PronInfoService {
 
     @Autowired
-    private PronInfoDAO pronInfoDAO;
+    private PronInfoOverviewDAO pronInfoDAO;
     @Autowired
     private PronEventDAO pronEventDAO;
     @Autowired

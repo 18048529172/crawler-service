@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 /**
  * @author liwei
  */
-public interface PronInfoDAO extends JpaRepository<PronInfoOverview,String>,JpaSpecificationExecutor<PronInfoOverview> {
+public interface PronInfoOverviewDAO extends JpaRepository<PronInfoOverview,String>,JpaSpecificationExecutor<PronInfoOverview> {
     /**
      *  统计viewkey的条数
      * @param viewKey
