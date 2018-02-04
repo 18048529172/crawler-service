@@ -1,7 +1,6 @@
 package com.liw.crawler.service.pron.dao;
 
 import com.liw.crawler.service.pron.entity.PronEvent;
-import com.liw.crawler.service.pron.entity.PronInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

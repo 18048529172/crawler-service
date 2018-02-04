@@ -3,17 +3,12 @@ package com.liw.crawler.service.pron.web;
 import com.liw.crawler.service.pron.dao.specification.PageEntity;
 import com.liw.crawler.service.pron.dao.specification.PronInfoQuery;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
-import com.liw.crawler.service.pron.entity.PronInfo;
-import com.liw.crawler.service.pron.entity.dto.PronInfoQueryObject;
+import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import com.liw.crawler.service.pron.service.PronInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 public class PronCrawlerController {
@@ -63,15 +58,14 @@ public class PronCrawlerController {
         return this.pronInfoService.getDownAddress(id);
     }
 
-
     @PostMapping("/pron/list")
-   public PageEntity<PronInfo> list(PronInfoQuery pronInfoQuery,
-                                    @RequestParam("page") int page,
-                                    @RequestParam("rows") int pageSize){
+   public PageEntity<PronInfoOverview> list(PronInfoQuery pronInfoQuery,
+                                            @RequestParam("page") int page,
+                                            @RequestParam("rows") int pageSize){
         PronInfoSpecificationExecutor pronInfoSpecificationExecutor = new PronInfoSpecificationExecutor(pronInfoQuery);
         PageRequest pageRequest = new PageRequest((page -1),pageSize);
-        Page<PronInfo> pronInfos = this.pronInfoService.find(pronInfoSpecificationExecutor, pageRequest);
-        PageEntity<PronInfo> pronInfoPageEntity = new PageEntity<>();
+        Page<PronInfoOverview> pronInfos = this.pronInfoService.find(pronInfoSpecificationExecutor, pageRequest);
+        PageEntity<PronInfoOverview> pronInfoPageEntity = new PageEntity<>();
         pronInfoPageEntity.setRows(pronInfos.getContent());
         pronInfoPageEntity.setTotalPage(pronInfos.getTotalPages());
         pronInfoPageEntity.setTotal(pronInfos.getTotalElements());

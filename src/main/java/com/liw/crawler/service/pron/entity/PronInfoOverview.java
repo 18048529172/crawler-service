@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author liwei
  */
 @Entity
-public class PronInfo implements Serializable {
+public class PronInfoOverview implements Serializable {
 
     @Id
     @GenericGenerator(name="idGenerator", strategy="uuid")
@@ -26,6 +26,8 @@ public class PronInfo implements Serializable {
     private String viewKey;
 
     private String content;
+
+    private String coverImage;
 
     public String getId() {
         return id;
@@ -65,6 +67,14 @@ public class PronInfo implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(String coverImage) {
+        this.coverImage = coverImage;
     }
 
     @Override

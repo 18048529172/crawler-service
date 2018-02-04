@@ -1,6 +1,6 @@
 package com.liw.crawler.service.pron.dao.specification;
 
-import com.liw.crawler.service.pron.entity.PronInfo;
+import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PronInfoSpecificationExecutor implements Specification<PronInfo> {
+public class PronInfoSpecificationExecutor implements Specification<PronInfoOverview> {
 
     private PronInfoQuery pronInfoQuery;
 
@@ -21,7 +21,7 @@ public class PronInfoSpecificationExecutor implements Specification<PronInfo> {
     }
 
     @Override
-    public Predicate toPredicate(Root<PronInfo> root,
+    public Predicate toPredicate(Root<PronInfoOverview> root,
                                  CriteriaQuery<?> criteriaQuery,
                                  CriteriaBuilder criteriaBuilder) {
         String keyword = this.pronInfoQuery.getKeyword();

@@ -1,6 +1,6 @@
 package com.liw.crawler.service.pron.service.helper;
 
-import com.liw.crawler.service.pron.entity.PronInfo;
+import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,8 +19,17 @@ public class PronDocUtils {
         Elements listchannels = doc.getElementsByClass("listchannel");
         for(Iterator<Element> iterator = listchannels.iterator(); iterator.hasNext();){
             Element element = iterator.next();
-            Elements aEles = element.getElementsByTag("a");
             PronOverview pronOverview = new PronOverview();
+            Elements imgs = element.getElementsByTag("img");
+            for(int i=0;i<imgs.size();i++){
+                Element imgElement = imgs.get(i);
+                String src = imgElement.attr("src");
+                if(StringUtils.isNotBlank(src) && StringUtils.contains(src,"img.t6k.co")){
+                    pronOverview.setCoverImage(src);
+                    break;
+                }
+            }
+            Elements aEles = element.getElementsByTag("a");
             for(Iterator<Element> iterator1 = aEles.iterator();iterator1.hasNext();) {
                 Element aelement = iterator1.next();
                 String tagName = aelement.tagName().toLowerCase();
@@ -65,6 +74,8 @@ public class PronDocUtils {
         }
         return null;
     }
+
+
 
 
 }

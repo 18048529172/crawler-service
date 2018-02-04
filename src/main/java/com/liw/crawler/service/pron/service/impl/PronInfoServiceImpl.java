@@ -5,7 +5,7 @@ import com.liw.crawler.service.pron.dao.PronEventDAO;
 import com.liw.crawler.service.pron.dao.PronInfoDAO;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
 import com.liw.crawler.service.pron.entity.PronEvent;
-import com.liw.crawler.service.pron.entity.PronInfo;
+import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import com.liw.crawler.service.pron.service.PronCrawler;
 import com.liw.crawler.service.pron.service.PronInfoService;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -15,11 +15,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -50,7 +48,7 @@ public class PronInfoServiceImpl  implements PronInfoService {
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public void save(PronInfo pronInfo) {
+    public void save(PronInfoOverview pronInfo) {
         //判断是否存在
         long viewkeyCount = this.countByViewKey(pronInfo.getViewKey());
         if(viewkeyCount == 0){
@@ -90,7 +88,7 @@ public class PronInfoServiceImpl  implements PronInfoService {
 
     @Override
     public String getAdress(String id) {
-        PronInfo pronInfo = this.pronInfoDAO.findOne(id);
+        PronInfoOverview pronInfo = this.pronInfoDAO.findOne(id);
         return "http://"+this.prondomainhost+"/"+this.pageDetailUrl +"?viewkey="+pronInfo.getViewKey();
     }
 
@@ -107,12 +105,12 @@ public class PronInfoServiceImpl  implements PronInfoService {
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void updateContent(String id, String content) {
-        PronInfo pronInfo = this.pronInfoDAO.findOne(id);
+        PronInfoOverview pronInfo = this.pronInfoDAO.findOne(id);
         pronInfo.setContent(content);
     }
 
     @Override
-    public Page<PronInfo> find(PronInfoSpecificationExecutor pronInfoSpecificationExecutor, PageRequest pageRequest) {
+    public Page<PronInfoOverview> find(PronInfoSpecificationExecutor pronInfoSpecificationExecutor, PageRequest pageRequest) {
         return this.pronInfoDAO.findAll(pronInfoSpecificationExecutor,pageRequest);
     }
 
@@ -130,6 +128,10 @@ public class PronInfoServiceImpl  implements PronInfoService {
         return null;
     }
 
+    @Override
+    public PronInfoOverview findById(String id) {
+        return this.pronInfoDAO.findOne(id);
+    }
 
 
 }

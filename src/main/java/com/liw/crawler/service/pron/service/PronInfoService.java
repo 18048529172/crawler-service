@@ -1,7 +1,7 @@
 package com.liw.crawler.service.pron.service;
 
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
-import com.liw.crawler.service.pron.entity.PronInfo;
+import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -11,7 +11,7 @@ public interface PronInfoService {
      * 保存
      * @param pronInfo
      */
-    void save(PronInfo pronInfo);
+    void save(PronInfoOverview pronInfo);
 
     /**
      * 查询viewkey是否存在
@@ -53,7 +53,7 @@ public interface PronInfoService {
      * @param pageRequest
      * @return
      */
-    Page<PronInfo> find(PronInfoSpecificationExecutor pronInfoSpecificationExecutor, PageRequest pageRequest);
+    Page<PronInfoOverview> find(PronInfoSpecificationExecutor pronInfoSpecificationExecutor, PageRequest pageRequest);
 
     /**
      *  获取下载地址
@@ -61,4 +61,6 @@ public interface PronInfoService {
      * @return
      */
     String getDownAddress(String id);
+
+    PronInfoOverview findById(String id);
 }

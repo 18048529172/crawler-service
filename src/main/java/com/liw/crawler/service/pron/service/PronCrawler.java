@@ -4,28 +4,16 @@ import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.HttpRequest;
-import cn.edu.hfut.dmic.webcollector.net.HttpResponse;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
-import com.liw.crawler.service.pron.dao.PronInfoDAO;
-import com.liw.crawler.service.pron.entity.PronInfo;
 import com.liw.crawler.service.pron.event.PronOverviewEvent;
-import com.liw.crawler.service.pron.service.PronInfoService;
 import com.liw.crawler.service.pron.service.helper.PronDocUtils;
 import com.liw.crawler.service.pron.service.helper.PronOverview;
-import org.apache.catalina.core.ApplicationContext;
-import org.apache.catalina.core.ApplicationPushBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 /**
