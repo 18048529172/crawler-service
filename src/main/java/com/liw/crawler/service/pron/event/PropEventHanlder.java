@@ -77,7 +77,7 @@ public class PropEventHanlder implements SystemStartHandler {
         String openDetailUrl = "http://"+host+"/"+pageDetailUrl +"?viewkey="+viewKey;
         Document detailDOC = Jsoup
                 .connect(openDetailUrl)
-                .header("Accept-Language","zh-CN,zh;q=0.8,en;q=0.6,ja;q=0.4,zh-TW;q=0.2")
+                .header(SystemConfigEnum.PRON_DOMAIN_ACCEPT_LANGUAGE.getName(),systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_ACCEPT_LANGUAGE.getName()))
                 .timeout(10000)
                 .get();
         Elements spanMore = detailDOC.getElementsByClass("more");

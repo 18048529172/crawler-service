@@ -4,7 +4,8 @@ public enum SystemConfigEnum {
 
     PRON_DOMAIN_HOST("pron.domain.host","网站域名"),
     PRON_DOMAIN_DETAIL("pron.domain.video.page.detail","详情地址"),
-    PRON_DOMAIN_PAGE_LIST("pron.domain.video.page.list","列表地址")
+    PRON_DOMAIN_PAGE_LIST("pron.domain.video.page.list","列表地址"),
+    PRON_DOMAIN_ACCEPT_LANGUAGE("Accept-Language","解析网的语言")
     ;
 
     private SystemConfigEnum( String name,String memo){
