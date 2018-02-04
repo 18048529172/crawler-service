@@ -3,8 +3,11 @@ package com.liw.crawler.service.pron.web;
 import com.liw.crawler.service.pron.dao.specification.PageEntity;
 import com.liw.crawler.service.pron.dao.specification.PronInfoQuery;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
+import com.liw.crawler.service.pron.dao.specification.ResultEntity;
 import com.liw.crawler.service.pron.entity.PronInfoOverview;
+import com.liw.crawler.service.pron.entity.SystemConfig;
 import com.liw.crawler.service.pron.service.PronInfoService;
+import com.liw.crawler.service.pron.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +18,8 @@ public class PronCrawlerController {
 
     @Autowired
     private PronInfoService pronInfoService;
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     /**
      *  开始
@@ -71,6 +76,50 @@ public class PronCrawlerController {
         pronInfoPageEntity.setTotal(pronInfos.getTotalElements());
         return pronInfoPageEntity;
    }
+
+   @PostMapping("/pron/config/add")
+   public String addConfig(@RequestBody SystemConfig systemConfig){
+        try{
+            systemConfigService.save(systemConfig);
+        } catch (Exception e){
+            return "fail";
+        }
+        return "ok";
+   }
+
+    @PostMapping("/pron/config/update")
+    public String updateConfig(@RequestParam("name") String name,@RequestParam("proValue") String proValue){
+        try{
+            systemConfigService.updateProValueByName(name,proValue);
+        } catch (Exception e){
+            return "fail";
+        }
+        return "ok";
+    }
+
+
+    @PostMapping("/pron/config/delete")
+    public String deleteConfig(@RequestParam("name") String name){
+        try{
+            systemConfigService.deleteByName(name);
+        } catch (Exception e){
+            return "fail";
+        }
+        return "ok";
+    }
+
+    @PostMapping("/pron/config/list")
+    public ResultEntity<SystemConfig> listConfig(){
+        ResultEntity<SystemConfig> systemConfigPageEntity = new ResultEntity<>();
+        systemConfigPageEntity.setRows(this.systemConfigService.listAll());
+        return systemConfigPageEntity;
+    }
+
+
+
+
+
+
 
 
 }

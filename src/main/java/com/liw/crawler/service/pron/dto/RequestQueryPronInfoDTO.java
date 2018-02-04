@@ -1,8 +1,8 @@
-package com.liw.crawler.service.pron.entity.dto;
+package com.liw.crawler.service.pron.dto;
 
 import java.io.Serializable;
 
-public class PronInfoQueryObject implements Serializable {
+public class RequestQueryPronInfoDTO implements Serializable {
 
     private String title;
 
