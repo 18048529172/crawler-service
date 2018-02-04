@@ -9,4 +9,6 @@ public interface SystemConfigDAO extends JpaRepository<SystemConfig,String>,JpaS
 
 
     SystemConfig findOneByName(String name);
+
+    long countByName( String name);
 }

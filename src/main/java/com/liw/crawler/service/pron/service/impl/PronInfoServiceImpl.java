@@ -6,15 +6,16 @@ import com.liw.crawler.service.pron.dao.PronInfoOverviewDAO;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
 import com.liw.crawler.service.pron.entity.PronEvent;
 import com.liw.crawler.service.pron.entity.PronInfoOverview;
+import com.liw.crawler.service.pron.enums.SystemConfigEnum;
 import com.liw.crawler.service.pron.service.PronCrawler;
 import com.liw.crawler.service.pron.service.PronInfoService;
+import com.liw.crawler.service.pron.service.SystemConfigService;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,14 +35,8 @@ public class PronInfoServiceImpl  implements PronInfoService {
     private PronEventDAO pronEventDAO;
     @Autowired
     private PronCrawler pronCrawler;
-
-    @Value("${pron.domain.host}")
-    private String prondomainhost;
-    @Value("${pron.domain.video.page.list}")
-    private String pronPageList;
-
-    @Value("${pron.domain.video.page.detail}")
-    private String pageDetailUrl;
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     private final static ExecutorService executorService=new ScheduledThreadPoolExecutor(50,new BasicThreadFactory.Builder().namingPattern("crawler").daemon(true).build());
 
@@ -89,7 +84,9 @@ public class PronInfoServiceImpl  implements PronInfoService {
     @Override
     public String getAdress(String id) {
         PronInfoOverview pronInfo = this.pronInfoDAO.findOne(id);
-        return "http://"+this.prondomainhost+"/"+this.pageDetailUrl +"?viewkey="+pronInfo.getViewKey();
+        String host = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_HOST.getName());
+        String pageDetailUrl = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_DETAIL.getName());
+        return "http://"+host+"/"+pageDetailUrl +"?viewkey="+pronInfo.getViewKey();
     }
 
     @Override
@@ -98,7 +95,9 @@ public class PronInfoServiceImpl  implements PronInfoService {
     }
 
     private String getStartPage(int pageNumber) {
-        String page =  "http://"+this.prondomainhost+"/"+this.pronPageList;
+        String host = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_HOST.getName());
+        String pronPageList = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_PAGE_LIST.getName());
+        String page =  "http://"+host+"/"+pronPageList;
         return page + pageNumber;
     }
 

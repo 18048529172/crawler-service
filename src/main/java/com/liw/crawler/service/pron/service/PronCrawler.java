@@ -5,12 +5,12 @@ import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.HttpRequest;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
+import com.liw.crawler.service.pron.enums.SystemConfigEnum;
 import com.liw.crawler.service.pron.event.PronOverviewEvent;
 import com.liw.crawler.service.pron.service.helper.PronDocUtils;
 import com.liw.crawler.service.pron.service.helper.PronOverview;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +26,8 @@ public class PronCrawler extends BreadthCrawler {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Value("${pron.domain.host}")
-    private String prondomainhost;
-    @Value("${pron.domain.video.page.list}")
-    private String pronPageList;
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     /**
      * 构造一个基于伯克利DB的爬虫
@@ -70,7 +68,9 @@ public class PronCrawler extends BreadthCrawler {
     }
 
     private String getStartPage(int pageNumber) {
-        String page =  "http://"+this.prondomainhost+"/"+this.pronPageList;
+        String host = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_HOST.getName());
+        String pageList = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_PAGE_LIST.getName());
+        String page =  "http://"+host+"/"+pageList;
         return page + pageNumber;
     }
 

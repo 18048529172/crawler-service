@@ -4,8 +4,11 @@ package com.liw.crawler.service.pron.event;
 import com.alibaba.fastjson.JSONObject;
 import com.liw.crawler.service.pron.Constant;
 import com.liw.crawler.service.pron.entity.PronEvent;
+import com.liw.crawler.service.pron.enums.SystemConfigEnum;
 import com.liw.crawler.service.pron.service.PronEventService;
 import com.liw.crawler.service.pron.service.PronInfoService;
+import com.liw.crawler.service.pron.service.SystemConfigService;
+import com.liw.crawler.service.pron.systems.SystemStartHandler;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,8 +17,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Component
-public class PropEventHanlder implements CommandLineRunner {
+public class PropEventHanlder implements SystemStartHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(PropEventHanlder.class);
 
@@ -35,12 +36,9 @@ public class PropEventHanlder implements CommandLineRunner {
     private PronEventService pronEventService;
     @Autowired
     private PronInfoService pronInfoService;
+    @Autowired
+    private SystemConfigService systemConfigService;
 
-    @Value("${pron.domain.video.page.detail}")
-    private String pageDetailUrl;
-
-    @Value("${pron.domain.host}")
-    private String prondomainhost;
 
     public void doEvent(){
 
@@ -74,7 +72,9 @@ public class PropEventHanlder implements CommandLineRunner {
     }
 
     public String getContentByViewKey(String viewKey) throws IOException {
-        String openDetailUrl = "http://"+this.prondomainhost+"/"+this.pageDetailUrl +"?viewkey="+viewKey;
+        String host = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_HOST.getName());
+        String pageDetailUrl = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_DETAIL.getName());
+        String openDetailUrl = "http://"+host+"/"+pageDetailUrl +"?viewkey="+viewKey;
         Document detailDOC = Jsoup
                 .connect(openDetailUrl)
                 .header("Accept-Language","zh-CN,zh;q=0.8,en;q=0.6,ja;q=0.4,zh-TW;q=0.2")
@@ -91,8 +91,19 @@ public class PropEventHanlder implements CommandLineRunner {
         return  null;
     }
 
+
     @Override
-    public void run(String... strings) throws Exception {
+    public int sort() {
+        return 0;
+    }
+
+    @Override
+    public void execute() {
         this.doEvent();
+    }
+
+    @Override
+    public int compareTo(SystemStartHandler o) {
+        return this.sort() - o.sort();
     }
 }
