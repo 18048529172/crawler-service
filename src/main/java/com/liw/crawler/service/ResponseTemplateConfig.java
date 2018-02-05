@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2017/12/31 17:23
  */
 @Configuration
-public class ReponseConfig {
+public class ResponseTemplateConfig {
 
     @Bean
     public ResponseTemplate builder(){
