@@ -24,6 +24,7 @@ public class PronCrawlerController {
     @Autowired
     private SystemConfigService systemConfigService;
 
+    @Autowired
     private ResponseTemplate responseTemplate;
 
     /**
