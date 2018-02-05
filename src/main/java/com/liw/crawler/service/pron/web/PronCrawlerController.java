@@ -1,16 +1,13 @@
 package com.liw.crawler.service.pron.web;
 
-import com.liw.crawler.service.pron.dao.specification.PageEntity;
 import com.liw.crawler.service.pron.dao.specification.PronInfoQuery;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
-import com.liw.crawler.service.pron.dao.specification.ResultEntity;
 import com.liw.crawler.service.pron.entity.PronInfoOverview;
-import com.liw.crawler.service.pron.entity.SystemConfig;
 import com.liw.crawler.service.pron.service.PronInfoService;
 import com.liw.crawler.service.pron.service.SystemConfigService;
-import com.micro.base.web.response.Body;
-import com.micro.base.web.response.Response;
-import com.micro.base.web.response.ResponseTemplate;
+import com.micro.web.response.Body;
+import com.micro.web.response.Response;
+import com.micro.web.response.ResponseTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +44,10 @@ public class PronCrawlerController {
         });
     }
 
+    /**
+     *  停止
+     * @return
+     */
     @PostMapping("/pron/stop")
     public Response stop(){
         return this.responseTemplate.doResponse(()->{
@@ -55,6 +56,11 @@ public class PronCrawlerController {
         });
     }
 
+    /**
+     *  打开地址
+     * @param id
+     * @return
+     */
     @GetMapping("/pron/address/{id}")
     public Response address(@PathVariable("id") String id){
         return this.responseTemplate.doResponse(()->{
@@ -63,6 +69,11 @@ public class PronCrawlerController {
         });
     }
 
+    /**
+     *  下载地址
+     * @param id
+     * @return
+     */
     @GetMapping("/pron/down/{id}")
     public Response getDownAddress(@PathVariable("id") String id){
         return this.responseTemplate.doResponse(()->{
@@ -71,29 +82,35 @@ public class PronCrawlerController {
         });
     }
 
-    @PostMapping("/pron/list")
-   public PageEntity<PronInfoOverview> list(PronInfoQuery pronInfoQuery,
+    /**
+     *  分页查询
+      * @param pronInfoQuery
+     * @param page
+     * @param pageSize
+     * @return
+     */
+   @PostMapping("/pron/list")
+   public Response list(PronInfoQuery pronInfoQuery,
                                             @RequestParam("page") int page,
                                             @RequestParam("rows") int pageSize){
-        PronInfoSpecificationExecutor pronInfoSpecificationExecutor = new PronInfoSpecificationExecutor(pronInfoQuery);
-        PageRequest pageRequest = new PageRequest((page -1),pageSize);
-        Page<PronInfoOverview> pronInfos = this.pronInfoService.find(pronInfoSpecificationExecutor, pageRequest);
-        PageEntity<PronInfoOverview> pronInfoPageEntity = new PageEntity<>();
-        pronInfoPageEntity.setRows(pronInfos.getContent());
-        pronInfoPageEntity.setTotalPage(pronInfos.getTotalPages());
-        pronInfoPageEntity.setTotal(pronInfos.getTotalElements());
-        return pronInfoPageEntity;
-   }
-
-   @PostMapping("/pron/config/add")
-   public Response addConfig(@RequestBody SystemConfig systemConfig){
-       return this.responseTemplate.doResponse(()->{
-           systemConfigService.save(systemConfig);
-           return null;
-       });
+        return this.responseTemplate.doResponse(()->{
+            PronInfoSpecificationExecutor pronInfoSpecificationExecutor = new PronInfoSpecificationExecutor(pronInfoQuery);
+            PageRequest pageRequest = new PageRequest((page -1),pageSize);
+            Page<PronInfoOverview> pronInfos = this.pronInfoService.find(pronInfoSpecificationExecutor, pageRequest);
+            return Body
+                    .create("rows",pronInfos.getContent())
+                    .append("totalRows",pronInfos.getTotalElements())
+                    .append("totalPage",pronInfos.getTotalPages());
+        });
 
    }
 
+    /**
+     *  修改配置
+     * @param name
+     * @param proValue
+     * @return
+     */
     @PostMapping("/pron/config/update")
     public Response updateConfig(@RequestParam("name") String name,@RequestParam("proValue") String proValue){
         return this.responseTemplate.doResponse(()->{
@@ -102,7 +119,11 @@ public class PronCrawlerController {
         });
     }
 
-
+    /**
+     *  删除配置
+     * @param name
+     * @return
+     */
     @PostMapping("/pron/config/delete")
     public Response deleteConfig(@RequestParam("name") String name){
         return this.responseTemplate.doResponse(()->{
@@ -112,13 +133,16 @@ public class PronCrawlerController {
 
     }
 
-    @PostMapping("/pron/config/list")
-    public ResultEntity<SystemConfig> listConfig(){
-        ResultEntity<SystemConfig> systemConfigPageEntity = new ResultEntity<>();
-        systemConfigPageEntity.setRows(this.systemConfigService.listAll());
-        return systemConfigPageEntity;
+    /**
+     *  查询所有配置
+     * @return
+     */
+    @GetMapping("/pron/config/list")
+    public Response listConfig(){
+        return this.responseTemplate.doResponse(()->{
+            return Body.create("rows",this.systemConfigService.listAll());
+        });
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 package com.liw.crawler.service;
 
-import com.micro.base.web.response.ResponseTemplate;
+import com.micro.web.response.ResponseTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +15,7 @@ public class ReponseConfig {
 
     @Bean
     public ResponseTemplate builder(){
-        ResponseTemplate responseTemplate = new ResponseTemplate();
+        ResponseTemplate responseTemplate = new ResponseTemplate("请求错误");
         return responseTemplate;
     }
 }

@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>com.micro.base.web.response</groupId>
 			<artifactId>base-web-response</artifactId>
-			<version>1.0</version>
+			<version>1.0.2</version>
 		</dependency>
 
 		<dependency>
