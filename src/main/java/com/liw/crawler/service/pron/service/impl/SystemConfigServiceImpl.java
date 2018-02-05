@@ -6,6 +6,9 @@ import com.liw.crawler.service.pron.enums.SystemConfigEnum;
 import com.liw.crawler.service.pron.service.SystemConfigService;
 import com.liw.crawler.service.pron.systems.SystemStartHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,8 @@ public class SystemConfigServiceImpl implements SystemConfigService,SystemStartH
     @Autowired
     private SystemConfigDAO systemConfigDAO;
 
+
+    @CachePut(value="systemConfig" ,key="#name + '_systemConfig'")
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void updateProValueByName(String name, String proValue) {
@@ -30,6 +35,8 @@ public class SystemConfigServiceImpl implements SystemConfigService,SystemStartH
         this.systemConfigDAO.save(systemConfig);
     }
 
+
+    @CacheEvict(value="systemConfig" ,key="#name + '_systemConfig'")
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void deleteByName(String name) {
@@ -42,6 +49,8 @@ public class SystemConfigServiceImpl implements SystemConfigService,SystemStartH
         return this.systemConfigDAO.findAll();
     }
 
+
+    @Cacheable(value="systemConfig" ,key="#name + '_systemConfig'")
     @Override
     public String getByName(String name) {
         return this.systemConfigDAO.findOneByName(name).getProValue();
