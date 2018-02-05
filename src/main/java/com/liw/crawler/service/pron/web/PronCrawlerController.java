@@ -8,6 +8,9 @@ import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import com.liw.crawler.service.pron.entity.SystemConfig;
 import com.liw.crawler.service.pron.service.PronInfoService;
 import com.liw.crawler.service.pron.service.SystemConfigService;
+import com.micro.base.web.response.Body;
+import com.micro.base.web.response.Response;
+import com.micro.base.web.response.ResponseTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +24,8 @@ public class PronCrawlerController {
     @Autowired
     private SystemConfigService systemConfigService;
 
+    private ResponseTemplate responseTemplate;
+
     /**
      *  开始
      * @param thread ： 线程数
@@ -30,37 +35,39 @@ public class PronCrawlerController {
      * @return
      */
     @PostMapping("/pron/start/{startPage}/{endPage}/{thread}/{deepth}")
-    public String start(@PathVariable("thread") Integer thread,
-                        @PathVariable("deepth") int deepth,
-                        @PathVariable("startPage") int startPage,
-                        @PathVariable("endPage") int endPage
+    public Response start(@PathVariable("thread") Integer thread,
+                          @PathVariable("deepth") int deepth,
+                          @PathVariable("startPage") int startPage,
+                          @PathVariable("endPage") int endPage
                         ){
-       try{
-          this.pronInfoService.start(startPage,endPage,thread,deepth);
-       } catch (Exception e){
-           return "fail";
-       }
-       return "ok";
+        return this.responseTemplate.doResponse(()->{
+            this.pronInfoService.start(startPage,endPage,thread,deepth);
+            return null;
+        });
     }
 
     @PostMapping("/pron/stop")
-    public String stop(){
-        try{
+    public Response stop(){
+        return this.responseTemplate.doResponse(()->{
             this.pronInfoService.stop();
-        } catch (Exception e){
-            return "fail";
-        }
-        return "ok";
+            return null;
+        });
     }
 
     @GetMapping("/pron/address/{id}")
-    public String address(@PathVariable("id") String id){
-        return this.pronInfoService.getAdress(id);
+    public Response address(@PathVariable("id") String id){
+        return this.responseTemplate.doResponse(()->{
+            String address = this.pronInfoService.getAdress(id);
+            return Body.create("openAddress",address);
+        });
     }
 
     @GetMapping("/pron/down/{id}")
-    public String getDownAddress(@PathVariable("id") String id){
-        return this.pronInfoService.getDownAddress(id);
+    public Response getDownAddress(@PathVariable("id") String id){
+        return this.responseTemplate.doResponse(()->{
+            String address = this.pronInfoService.getAdress(id);
+            return Body.create("downUrl",this.pronInfoService.getDownAddress(id));
+        });
     }
 
     @PostMapping("/pron/list")
@@ -78,34 +85,30 @@ public class PronCrawlerController {
    }
 
    @PostMapping("/pron/config/add")
-   public String addConfig(@RequestBody SystemConfig systemConfig){
-        try{
-            systemConfigService.save(systemConfig);
-        } catch (Exception e){
-            return "fail";
-        }
-        return "ok";
+   public Response addConfig(@RequestBody SystemConfig systemConfig){
+       return this.responseTemplate.doResponse(()->{
+           systemConfigService.save(systemConfig);
+           return null;
+       });
+
    }
 
     @PostMapping("/pron/config/update")
-    public String updateConfig(@RequestParam("name") String name,@RequestParam("proValue") String proValue){
-        try{
+    public Response updateConfig(@RequestParam("name") String name,@RequestParam("proValue") String proValue){
+        return this.responseTemplate.doResponse(()->{
             systemConfigService.updateProValueByName(name,proValue);
-        } catch (Exception e){
-            return "fail";
-        }
-        return "ok";
+            return null;
+        });
     }
 
 
     @PostMapping("/pron/config/delete")
-    public String deleteConfig(@RequestParam("name") String name){
-        try{
+    public Response deleteConfig(@RequestParam("name") String name){
+        return this.responseTemplate.doResponse(()->{
             systemConfigService.deleteByName(name);
-        } catch (Exception e){
-            return "fail";
-        }
-        return "ok";
+            return null;
+        });
+
     }
 
     @PostMapping("/pron/config/list")
