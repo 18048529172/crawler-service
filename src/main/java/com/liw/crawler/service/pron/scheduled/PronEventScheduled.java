@@ -1,7 +1,7 @@
 package com.liw.crawler.service.pron.scheduled;
 
-import com.liw.crawler.service.pron.Constant;
 import com.liw.crawler.service.pron.entity.PronEvent;
+import com.liw.crawler.service.pron.enums.RedisEventListEnum;
 import com.liw.crawler.service.pron.service.PronEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,14 +20,14 @@ public class PronEventScheduled {
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void loadTop1Event(){
-        long size = this.stringRedisTemplate.opsForList().size(Constant.KEY);
-        if(size != 0){
-            return ;
+        long size = this.stringRedisTemplate.opsForList().size(RedisEventListEnum.KEY.getCode());
+        if(size == 0){
+            List<PronEvent> pronEventList = pronEventService.findTop200ByStatusIs0rderByCreatetimeAsc();
+            for(PronEvent pronEvent : pronEventList){
+                this.stringRedisTemplate.opsForList().leftPush(RedisEventListEnum.KEY.getCode(),pronEvent.toString());
+            }
         }
-        List<PronEvent> pronEventList = pronEventService.findTop200ByStatusIs0rderByCreatetimeAsc();
-        for(PronEvent pronEvent : pronEventList){
-            this.stringRedisTemplate.opsForList().leftPush(Constant.KEY,pronEvent.toString());
-        }
+
     }
 
 

@@ -2,8 +2,8 @@ package com.liw.crawler.service.pron.event;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.liw.crawler.service.pron.Constant;
 import com.liw.crawler.service.pron.entity.PronEvent;
+import com.liw.crawler.service.pron.enums.RedisEventListEnum;
 import com.liw.crawler.service.pron.enums.SystemConfigEnum;
 import com.liw.crawler.service.pron.service.PronEventService;
 import com.liw.crawler.service.pron.service.PronInfoService;
@@ -44,24 +44,20 @@ public class PropEventHanlder implements SystemStartHandler {
 
         ExecutorService executorService =  new ScheduledThreadPoolExecutor(1,new BasicThreadFactory.Builder().namingPattern("event").daemon(true).build());
         executorService.submit(()->{
-            //执行
             while(true){
                 try{
-                    String event = stringRedisTemplate.opsForList().rightPop(Constant.KEY);
-                    if(event == null){
-                        continue;
-                    }
-                    PronEvent pronEvent =  JSONObject.toJavaObject(JSONObject.parseObject(event), PronEvent.class);
-                    //处理
-                    String viewkey = pronEvent.getViewkey();
-                    try{
-                        String content = getContentByViewKey(viewkey);
-                        //处理成功，删除事件
-                        //更新内容
-                        pronInfoService.updateContent(pronEvent.getOverviewId(),content);
-                        pronEventService.delete(pronEvent.getId());
-                    }catch (Throwable throwable){
-                        LOGGER.error("采集内容出错,id:"+pronEvent.getId(),throwable);
+                    String event = stringRedisTemplate.opsForList().rightPop(RedisEventListEnum.KEY.getCode());
+                    if(event != null){
+                        PronEvent pronEvent =  JSONObject.toJavaObject(JSONObject.parseObject(event), PronEvent.class);
+                        //处理
+                        String viewkey = pronEvent.getViewkey();
+                        try{
+                            String content = getContentByViewKey(viewkey);
+                            pronInfoService.updateContent(pronEvent.getOverviewId(),content);
+                            pronEventService.delete(pronEvent.getId());
+                        }catch (Throwable throwable){
+                            LOGGER.error("采集内容出错,id:"+pronEvent.getId(),throwable);
+                        }
                     }
                 }catch (Throwable throwable){
                     LOGGER.error("采集内容出错",throwable);
