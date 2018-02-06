@@ -34,7 +34,7 @@ public class PronInfoSpecificationExecutor implements Specification<PronInfoOver
         }
         String author = this.pronInfoQuery.getAuthor();
         if(StringUtils.isNotBlank(author)){
-            Predicate authorLike = criteriaBuilder.like(root.get("author"),"%"+author+"%");
+            Predicate authorLike = criteriaBuilder.equal(root.get("author"),author);
             predicates.add(authorLike);
         }
         return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
