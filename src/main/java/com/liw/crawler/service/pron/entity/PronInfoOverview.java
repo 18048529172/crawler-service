@@ -6,12 +6,14 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
  * @author liwei
  */
 @Entity
+@Table(name = "pronInfo")
 public class PronInfoOverview implements Serializable {
 
     @Id
