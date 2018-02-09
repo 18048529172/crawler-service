@@ -27,7 +27,6 @@ public class PronEventScheduled {
                 this.stringRedisTemplate.opsForList().leftPush(RedisEventListEnum.KEY.getCode(),pronEvent.toString());
             }
         }
-
     }
 
 
