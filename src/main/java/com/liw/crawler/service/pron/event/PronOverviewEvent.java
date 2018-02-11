@@ -4,8 +4,14 @@ import org.springframework.context.ApplicationEvent;
 
 public class PronOverviewEvent extends ApplicationEvent {
 
-    public PronOverviewEvent(Object source) {
+    private String callId;
+
+    public PronOverviewEvent(Object source,String callId) {
         super(source);
+        this.callId = callId;
     }
 
+    public String getCallId() {
+        return callId;
+    }
 }

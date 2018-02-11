@@ -4,9 +4,12 @@ import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import com.liw.crawler.service.pron.dao.PronEventDAO;
 import com.liw.crawler.service.pron.dao.PronInfoOverviewDAO;
 import com.liw.crawler.service.pron.dao.specification.PronInfoSpecificationExecutor;
+import com.liw.crawler.service.pron.entity.CallEvent;
 import com.liw.crawler.service.pron.entity.PronEvent;
 import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import com.liw.crawler.service.pron.enums.SystemConfigEnum;
+import com.liw.crawler.service.pron.event.CallbackEvent;
+import com.liw.crawler.service.pron.service.CallEventService;
 import com.liw.crawler.service.pron.service.PronCrawler;
 import com.liw.crawler.service.pron.service.PronInfoService;
 import com.liw.crawler.service.pron.service.SystemConfigService;
@@ -16,27 +19,34 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Service
-public class PronInfoServiceImpl  implements PronInfoService {
+public class PronInfoServiceImpl  implements PronInfoService,ApplicationListener<CallbackEvent> {
 
     @Autowired
     private PronInfoOverviewDAO pronInfoDAO;
     @Autowired
     private PronEventDAO pronEventDAO;
     @Autowired
-    private PronCrawler pronCrawler;
-    @Autowired
     private SystemConfigService systemConfigService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private CallEventService callEventService;
 
     private final static ExecutorService executorService=new ScheduledThreadPoolExecutor(50,new BasicThreadFactory.Builder().namingPattern("crawler").daemon(true).build());
 
@@ -66,8 +76,9 @@ public class PronInfoServiceImpl  implements PronInfoService {
     }
 
     @Override
-    public void start(int startPage,int endPage, int threadNumber, int deepth) {
+    public void start(int startPage,int endPage, int threadNumber, int deepth,String callId) {
         executorService.submit(()->{
+            PronCrawler pronCrawler = new PronCrawler(applicationEventPublisher,systemConfigService,callId);
             pronCrawler.setThreads(threadNumber);
             for(int i=startPage;i<=endPage;i++){
                 String seedUrl = getStartPage(i);
@@ -76,9 +87,10 @@ public class PronInfoServiceImpl  implements PronInfoService {
             try {
                 pronCrawler.start(deepth);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         });
+
     }
 
     @Override
@@ -89,10 +101,6 @@ public class PronInfoServiceImpl  implements PronInfoService {
         return "http://"+host+"/"+pageDetailUrl +"?viewkey="+pronInfo.getViewKey();
     }
 
-    @Override
-    public void stop() {
-        this.pronCrawler.stop();
-    }
 
     private String getStartPage(int pageNumber) {
         String host = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_HOST.getName());
@@ -103,9 +111,16 @@ public class PronInfoServiceImpl  implements PronInfoService {
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public void updateContent(String id, String content) {
+    public void updateContentAndUploadTime(String id, String content,String uploadTime) {
         PronInfoOverview pronInfo = this.pronInfoDAO.findOne(id);
         pronInfo.setContent(content);
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(uploadTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        pronInfo.setUploadDate(date);
     }
 
     @Override
@@ -132,5 +147,17 @@ public class PronInfoServiceImpl  implements PronInfoService {
         return this.pronInfoDAO.findOne(id);
     }
 
+    @Override
+    public Long countByCallId(String callId) {
+        return pronInfoDAO.countByCallId(callId);
+    }
+
+
+    @Override
+    public void onApplicationEvent(CallbackEvent callbackEvent) {
+        CallEvent callEvent = new CallEvent();
+        callEvent.setCallbackId(callbackEvent.getCallId());
+        callEventService.save(callEvent);
+    }
 
 }

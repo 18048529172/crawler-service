@@ -5,45 +5,43 @@ import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.HttpRequest;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
+import cn.edu.hfut.dmic.webcollector.plugin.ram.RamCrawler;
 import com.liw.crawler.service.pron.enums.SystemConfigEnum;
+import com.liw.crawler.service.pron.event.CallbackEvent;
 import com.liw.crawler.service.pron.event.PronOverviewEvent;
 import com.liw.crawler.service.pron.service.helper.PronDocUtils;
 import com.liw.crawler.service.pron.service.helper.PronOverview;
+import org.apache.commons.io.FileUtils;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * @author liwei
  */
-@Service
-public class PronCrawler extends BreadthCrawler {
+//@Service
+public class PronCrawler extends RamCrawler {
 
 
-    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
     private SystemConfigService systemConfigService;
 
-    /**
-     * 构造一个基于伯克利DB的爬虫
-     * 伯克利DB文件夹为crawlPath，crawlPath中维护了历史URL等信息
-     * 不同任务不要使用相同的crawlPath
-     * 两个使用相同crawlPath的爬虫并行爬取会产生错误
-     *
-     * @param crawlPath 伯克利DB使用的文件夹
-     * @param autoParse 是否根据设置的正则自动探测新URL
-     */
-    public PronCrawler(String crawlPath, boolean autoParse) {
-        super(crawlPath, autoParse);
-    }
+    private String callId;
 
-    public PronCrawler() {
-        this("91pron", false);
+    public PronCrawler(
+            ApplicationEventPublisher applicationEventPublisher,
+            SystemConfigService systemConfigService,
+            String callId) {
+        super(false);
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.systemConfigService = systemConfigService;
+        this.callId = callId;
     }
 
     @Override
@@ -61,7 +59,7 @@ public class PronCrawler extends BreadthCrawler {
     public void visit(Page page, CrawlDatums next) {
         Document document = page.doc();
         List<PronOverview> pronOverviews = PronDocUtils.parser(document);
-        PronOverviewEvent pronOverviewEvent = new PronOverviewEvent(pronOverviews);
+        PronOverviewEvent pronOverviewEvent = new PronOverviewEvent(pronOverviews,callId);
         this.applicationEventPublisher.publishEvent(pronOverviewEvent);
     }
 
@@ -72,6 +70,9 @@ public class PronCrawler extends BreadthCrawler {
         return page + pageNumber;
     }
 
-
-
+    @Override
+    public void afterStop() {
+       //停止后执行回调
+       this.applicationEventPublisher.publishEvent(new CallbackEvent(this.callId));
+    }
 }

@@ -24,6 +24,10 @@ public class PronOverviewEventListerner implements ApplicationListener<PronOverv
             pronInfo.setTitle(pronOverview.getTitle());
             pronInfo.setAuthor(pronOverview.getAuthor());
             pronInfo.setViewKey(pronOverview.getViewkey());
+            pronInfo.setCoverImage(pronOverview.getCoverImage());
+            pronInfo.setUploadDate(pronOverview.getUploadDate());
+            pronInfo.setVideoTimeSize(pronOverview.getVideoTimeSize());
+            pronInfo.setCallId(pronOverviewEvent.getCallId());
             this.pronInfoService.save(pronInfo);
         }
     }

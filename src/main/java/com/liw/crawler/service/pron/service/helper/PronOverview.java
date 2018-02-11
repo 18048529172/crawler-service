@@ -1,5 +1,9 @@
 package com.liw.crawler.service.pron.service.helper;
 
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.Date;
+
 /**
  *  概览
  *
@@ -25,6 +29,18 @@ public class PronOverview {
      *  封面图片
      */
     private String coverImage;
+    /**
+     * 封面图片
+     */
+    private Date uploadDate;
+    /**
+     * 视频时长
+     */
+    private String videoTimeSize;
+    /**
+     *  回调id
+     */
+    private String callId;
 
 
 
@@ -60,4 +76,32 @@ public class PronOverview {
         this.coverImage = coverImage;
     }
 
+    public Date getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(Date uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public String getCallId() {
+        return callId;
+    }
+
+    public void setCallId(String callId) {
+        this.callId = callId;
+    }
+
+    public String getVideoTimeSize() {
+        return videoTimeSize;
+    }
+
+    public void setVideoTimeSize(String videoTimeSize) {
+        this.videoTimeSize = videoTimeSize;
+    }
+
+    @Override
+    public String toString() {
+        return JSONObject.toJSONString(this);
+    }
 }

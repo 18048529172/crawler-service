@@ -2,7 +2,7 @@ package com.liw.crawler.service.pron.dao.specification;
 
 public class PronInfoQuery {
 
-    private String keyword;
+    //private String keyword;
 
     private String title;
 
@@ -26,13 +26,13 @@ public class PronInfoQuery {
         this.content = content;
     }
 
-    public String getKeyword() {
+   /* public String getKeyword() {
         return keyword;
     }
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
-    }
+    }*/
 
     public String getAuthor() {
         return author;

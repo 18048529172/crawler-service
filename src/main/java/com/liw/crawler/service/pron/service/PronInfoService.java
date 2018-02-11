@@ -26,7 +26,7 @@ public interface PronInfoService {
      * @param threadNumber
      * @param deepth
      */
-    void start(int startPage,int endPage,int threadNumber,int deepth);
+    void start(int startPage,int endPage,int threadNumber,int deepth,String callId);
 
     /**
      *  获取地址
@@ -35,17 +35,13 @@ public interface PronInfoService {
      */
     String getAdress(String id);
 
-    /**
-     *  停止
-     */
-    void stop();
 
     /**
      *  更新
      * @param id
      * @param content
      */
-    void updateContent(String id,String content);
+    void updateContentAndUploadTime(String id, String content,String uploadTime);
 
     /**
      * 分页查询
@@ -63,4 +59,7 @@ public interface PronInfoService {
     String getDownAddress(String id);
 
     PronInfoOverview findById(String id);
+
+    Long  countByCallId(String callId);
+
 }

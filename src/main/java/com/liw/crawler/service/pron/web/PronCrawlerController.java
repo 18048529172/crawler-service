@@ -32,29 +32,19 @@ public class PronCrawlerController {
      * @param endPage ： 结束页
      * @return
      */
-    @PostMapping("/pron/start/{startPage}/{endPage}/{thread}/{deepth}")
+    @PostMapping("/pron/start/{startPage}/{endPage}/{thread}/{deepth}/{callId}")
     public Response start(@PathVariable("thread") Integer thread,
                           @PathVariable("deepth") int deepth,
                           @PathVariable("startPage") int startPage,
-                          @PathVariable("endPage") int endPage
+                          @PathVariable("endPage") int endPage,
+                          @PathVariable("callId") String callId
                         ){
         return this.responseTemplate.doResponse(()->{
-            this.pronInfoService.start(startPage,endPage,thread,deepth);
+            this.pronInfoService.start(startPage,endPage,thread,deepth,callId);
             return null;
         });
     }
 
-    /**
-     *  停止
-     * @return
-     */
-    @PostMapping("/pron/stop")
-    public Response stop(){
-        return this.responseTemplate.doResponse(()->{
-            this.pronInfoService.stop();
-            return null;
-        });
-    }
 
     /**
      *  打开地址

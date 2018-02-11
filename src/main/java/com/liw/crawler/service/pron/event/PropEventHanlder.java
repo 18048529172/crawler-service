@@ -9,6 +9,7 @@ import com.liw.crawler.service.pron.service.PronEventService;
 import com.liw.crawler.service.pron.service.PronInfoService;
 import com.liw.crawler.service.pron.service.SystemConfigService;
 import com.liw.crawler.service.pron.systems.SystemStartHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,7 +22,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -52,8 +55,8 @@ public class PropEventHanlder implements SystemStartHandler {
                         //处理
                         String viewkey = pronEvent.getViewkey();
                         try{
-                            String content = getContentByViewKey(viewkey);
-                            pronInfoService.updateContent(pronEvent.getOverviewId(),content);
+                            List<String> contentAndUploadTime = getContentAndUploadTimeByViewKey(viewkey);
+                            pronInfoService.updateContentAndUploadTime(pronEvent.getOverviewId(),contentAndUploadTime.get(0),contentAndUploadTime.get(1));
                             pronEventService.delete(pronEvent.getId());
                         }catch (Throwable throwable){
                             LOGGER.error("采集内容出错,id:"+pronEvent.getId(),throwable);
@@ -67,7 +70,8 @@ public class PropEventHanlder implements SystemStartHandler {
 
     }
 
-    public String getContentByViewKey(String viewKey) throws IOException {
+    public List<String> getContentAndUploadTimeByViewKey(String viewKey) throws IOException {
+        List<String> contentAndUpload = new ArrayList<>();
         String host = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_HOST.getName());
         String pageDetailUrl = this.systemConfigService.getByName(SystemConfigEnum.PRON_DOMAIN_DETAIL.getName());
         String openDetailUrl = "http://"+host+"/"+pageDetailUrl +"?viewkey="+viewKey;
@@ -81,10 +85,29 @@ public class PropEventHanlder implements SystemStartHandler {
             Element element1 = iterator2.next();
             if("span".equals(element1.tagName())){
                 String content = element1.text();
-                return content;
+                contentAndUpload.add(content);
+                break;
             }
         }
-        return  null;
+        if(contentAndUpload.isEmpty()){
+            contentAndUpload.add("无");
+        }
+        //<span class="info">添加时间: </span><span class="title">2018-02-10</span>&nbsp;&nbsp;***<br>
+        Elements spanElenents = detailDOC.getElementsByTag("span");
+        for(Iterator<Element> iterator = spanElenents.iterator();iterator.hasNext();){
+            Element spanElement = iterator.next();
+            String text = spanElement.text();
+            if(StringUtils.contains(text,"添加时间")){
+                Element uploadElement = spanElement.nextElementSibling();
+                String uploadTime = uploadElement.text();
+                contentAndUpload.add(uploadTime);
+                break;
+            }
+        }
+        if(contentAndUpload.size() == 1){
+            contentAndUpload.add("");
+        }
+        return  contentAndUpload;
     }
 
 

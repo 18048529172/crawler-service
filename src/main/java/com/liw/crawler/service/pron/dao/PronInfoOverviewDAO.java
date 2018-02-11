@@ -15,4 +15,6 @@ public interface PronInfoOverviewDAO extends JpaRepository<PronInfoOverview,Stri
      */
     Long countByViewKey(String viewKey);
 
+    Long countByCallId(String callId);
+
 }

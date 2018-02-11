@@ -24,13 +24,17 @@ public class PronInfoSpecificationExecutor implements Specification<PronInfoOver
     public Predicate toPredicate(Root<PronInfoOverview> root,
                                  CriteriaQuery<?> criteriaQuery,
                                  CriteriaBuilder criteriaBuilder) {
-        String keyword = this.pronInfoQuery.getKeyword();
+        //String keyword = this.pronInfoQuery.getKeyword();
         List<Predicate> predicates = new ArrayList<>();
-        if(StringUtils.isNotBlank(keyword)){
-            Predicate titleLike = criteriaBuilder.like(root.get("title"),"%"+keyword+"%");
-            Predicate contentLike = criteriaBuilder.like(root.get("content"),"%"+keyword+"%");
-            Predicate keywordLike = criteriaBuilder.or(titleLike,contentLike);
-            predicates.add(keywordLike);
+        String title = this.pronInfoQuery.getTitle();
+        if(StringUtils.isNotBlank(title)){
+            Predicate titleLike = criteriaBuilder.like(root.get("title"),"%"+title+"%");
+            predicates.add(titleLike);
+        }
+        String content = this.pronInfoQuery.getContent();
+        if(StringUtils.isNotBlank(content)){
+            Predicate titleLike = criteriaBuilder.like(root.get("content"),"%"+content+"%");
+            predicates.add(titleLike);
         }
         String author = this.pronInfoQuery.getAuthor();
         if(StringUtils.isNotBlank(author)){

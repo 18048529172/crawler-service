@@ -1,11 +1,16 @@
 package com.liw.crawler.service.pron.service.helper;
 
-import com.liw.crawler.service.pron.entity.PronInfoOverview;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import javax.xml.soap.Text;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,37 +25,63 @@ public class PronDocUtils {
         for(Iterator<Element> iterator = listchannels.iterator(); iterator.hasNext();){
             Element element = iterator.next();
             PronOverview pronOverview = new PronOverview();
-            Elements imgs = element.getElementsByTag("img");
-            for(int i=0;i<imgs.size();i++){
-                Element imgElement = imgs.get(i);
-                String src = imgElement.attr("src");
-                if(StringUtils.isNotBlank(src) && StringUtils.contains(src,"img.t6k.co")){
-                    pronOverview.setCoverImage(src);
-                    break;
-                }
-            }
-            Elements aEles = element.getElementsByTag("a");
-            for(Iterator<Element> iterator1 = aEles.iterator();iterator1.hasNext();) {
-                Element aelement = iterator1.next();
-                String tagName = aelement.tagName().toLowerCase();
-                if(!"a".equals(tagName)){
-                    continue;
-                }
-                String href = aelement.attr("href");
-                if(StringUtils.contains(href,"viewkey")){
-                    String title = aelement.attr("title");
-                    String viewkey = getParamByName(href,"viewkey");
-                    pronOverview.setTitle(title);
-                    pronOverview.setViewkey(viewkey);
-                }
-                if(StringUtils.contains(href,"UID")){
-                    String author = aelement.text();
-                    pronOverview.setAuthor(author);
-                }
-            }
+            pronOverview.setCoverImage(getCoverImage(element));
+            setTitleAndViewKeyAndAuthorAndTimeSize(element,pronOverview);
             overviews.add(pronOverview);
         }
         return overviews;
+    }
+
+    private static void setTitleAndViewKeyAndAuthorAndTimeSize(Element listchannel, PronOverview pronOverview) {
+        //单独的一个（listchannel）
+        //标题和作者都在A标签里
+        Elements linkElements = listchannel.getElementsByTag("a");
+        for(Iterator<Element> iterator = linkElements.iterator();iterator.hasNext();) {
+            Element linkElenent = iterator.next();
+            String attrHref = linkElenent.attr("href");
+            if(StringUtils.contains(attrHref,"viewkey")){
+                String attrTitle = linkElenent.attr("title");
+                String viewkey = getParamByName(attrHref,"viewkey");
+                pronOverview.setTitle(attrTitle);
+                pronOverview.setViewkey(viewkey);
+            }
+            //包含UID说明是作者
+            if(StringUtils.contains(attrHref,"UID")){
+                String author = linkElenent.text();
+                pronOverview.setAuthor(author);
+            }
+        }
+        //时长在<span class="info">时长:</span>10:00
+        //这里获取所有的span标签
+        Elements children = listchannel.children();
+        for(Iterator<Element> iterator = children.iterator();iterator.hasNext();){
+            Element element = iterator.next();
+            String attrText = element.text();
+            if(StringUtils.contains(attrText,"时长:")){
+                Node timeNode = element.nextSibling();
+                if(timeNode instanceof TextNode){
+                    TextNode runTimeSize = (TextNode) timeNode;
+                    String videoTimeSize = StringUtils.trim(runTimeSize.text());
+                    pronOverview.setVideoTimeSize(videoTimeSize);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    private static String getCoverImage(Element element) {
+        String coverImage = null;
+        Elements imgs = element.getElementsByTag("img");
+        for(int i=0;i<imgs.size();i++){
+            Element imgElement = imgs.get(i);
+            String src = imgElement.attr("src");
+            if(StringUtils.isNotBlank(src) && StringUtils.contains(src,"img.t6k.co")){
+                coverImage = src;
+                break;
+            }
+        }
+        return coverImage;
     }
 
     private static String getParamByName(String href, String name) {
@@ -74,6 +105,7 @@ public class PronDocUtils {
         }
         return null;
     }
+
 
 
 

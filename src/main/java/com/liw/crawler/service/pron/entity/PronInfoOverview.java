@@ -3,11 +3,9 @@ package com.liw.crawler.service.pron.entity;
 import com.alibaba.fastjson.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author liwei
@@ -27,9 +25,16 @@ public class PronInfoOverview implements Serializable {
 
     private String viewKey;
 
+    @Column(length = 8000)
     private String content;
 
     private String coverImage;
+
+    private Date uploadDate;
+
+    private String videoTimeSize;
+
+    private String callId;
 
     public String getId() {
         return id;
@@ -77,6 +82,30 @@ public class PronInfoOverview implements Serializable {
 
     public void setCoverImage(String coverImage) {
         this.coverImage = coverImage;
+    }
+
+    public String getVideoTimeSize() {
+        return videoTimeSize;
+    }
+
+    public void setVideoTimeSize(String videoTimeSize) {
+        this.videoTimeSize = videoTimeSize;
+    }
+
+    public Date getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(Date uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public String getCallId() {
+        return callId;
+    }
+
+    public void setCallId(String callId) {
+        this.callId = callId;
     }
 
     @Override
